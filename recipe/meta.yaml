@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "2.6.2" %}
+{% set version = "2.7.3" %}
 
 package:
   name: {{ name|lower }}
@@ -7,14 +7,14 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: ce131b1dd059a4d081e78595d618654bf9b9fc184d78352f24512375467257d1
+  sha256: b5ca1e9957321b5c5422c2333d7d155e2412e63ea583065d56d3371305ef8116
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
 
 build:
   number: 0
   # neither on Windows 32-bit nor on s390x there is right now arrow support
-  skip: true  # [win32 or s390x]
+  skip: true  # [win32 or s390x or py<36]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -37,11 +37,13 @@ requirements:
     - m2-patch  # [win]
   host:
     - python
-    - pip
-    - cython
     - arrow-cpp
-    - pyarrow
+    - cython
     - numpy
+    - pip
+    - pyarrow
+    - wheel
+    - setuptools >=40.6.0
   run:
     - python
     - {{ pin_compatible('pyarrow', max_pin='x') }}
@@ -52,9 +54,9 @@ requirements:
     - requests <3.0.0
     - pytz
     - pycryptodomex >=3.2,!=3.5.0,<4.0.0
-    - pyopenssl >=16.2.0,<21.0.0
+    - pyopenssl >=16.2.0,<22.0.0
     - cffi >=1.9,<2.0.0
-    - cryptography >=2.5.0,<4.0.0
+    - cryptography >=3.1.0,<37.0.0
     - pyjwt <3.0.0
     - oscrypto <2.0.0
     - asn1crypto >0.24.0,<2.0.0
@@ -68,7 +70,7 @@ requirements:
     - certifi >=2017.4.17
     - dataclasses <1  # [py<37]
   run_constrained:
-    - pandas >1,<1.4
+    - pandas >=1.0.0,<1.4.0
 
 test:
   requires:
@@ -77,11 +79,16 @@ test:
     - snowflake
     - snowflake.connector
     - snowflake.connector.arrow_iterator  # [unix]
+    - snowflake.connector.tool
   commands:
     - pip check
+    - snowflake-dump-ocsp-response --help
+    - snowflake-dump-ocsp-response-cache --help
+    - snowflake-dump-certs --help
+    - snowflake-export-certs --help
 
 about:
-  home: https://github.com/snowflakedb/snowflake-connector-python
+  home: https://www.snowflake.com
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE.txt
