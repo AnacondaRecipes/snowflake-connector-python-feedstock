@@ -1,5 +1,5 @@
 From 848c31431b5009572abf0a243ede9df5e82b4301 Mon Sep 17 00:00:00 2001
-From: Serhii Kupriienko <skupriienko@anaconda.com>
+From: Serhii Kupriienko
 Date: Wed, 2 Feb 2022 14:26:03 +0000
 Subject: [PATCH] Fix pyarrow
 
