@@ -82,10 +82,6 @@ test:
     - snowflake.connector.tool
   commands:
     - pip check
-    - snowflake-dump-ocsp-response --help
-    - snowflake-dump-ocsp-response-cache --help
-    - snowflake-dump-certs --help
-    - snowflake-export-certs --help
 
 about:
   home: https://www.snowflake.com

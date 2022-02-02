@@ -1,13 +1,12 @@
-From 2ae59810d039402f47546eeafce3a2eddae137d5 Mon Sep 17 00:00:00 2001
-From: Andrew Achkar <hajapy@users.noreply.github.com>
-Date: Sat, 22 Jan 2022 12:22:31 -0500
-Subject: [PATCH] drop pyarrow version numbers
+From 848c31431b5009572abf0a243ede9df5e82b4301 Mon Sep 17 00:00:00 2001
+From: Serhii Kupriienko <skupriienko@anaconda.com>
+Date: Wed, 2 Feb 2022 14:26:03 +0000
+Subject: [PATCH] Fix pyarrow
 
 ---
  pyproject.toml | 2 +-
- setup.cfg      | 2 +-
  setup.py       | 8 ++++----
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
 index 5781e59..d55b0a4 100644
@@ -20,18 +19,6 @@ index 5781e59..d55b0a4 100644
 -    "pyarrow>=6.0.0,<6.1.0",
 +    "pyarrow",
  ]
-diff --git a/setup.cfg b/setup.cfg
-index 27c337f..5065652 100644
---- a/setup.cfg
-+++ b/setup.cfg
-@@ -93,6 +93,6 @@ development =
-     pytzdata
- pandas =
-     pandas>=1.0.0,<1.4.0
--    pyarrow>=6.0.0,<6.1.0
-+    pyarrow
- secure-local-storage =
-     keyring!=16.1.0,<24.0.0
 diff --git a/setup.py b/setup.py
 index b72aacc..4d11ca9 100644
 --- a/setup.py
@@ -46,7 +33,7 @@ index b72aacc..4d11ca9 100644
 +            "darwin": ["libarrow.dylib", "libarrow_python.dylib"],
              "win32": ["arrow.dll", "arrow_python.dll"],
          }
-
+ 
          arrow_libs_to_link = {
 -            "linux": ["libarrow.so.600", "libarrow_python.so.600"],
 -            "darwin": ["libarrow.600.dylib", "libarrow_python.600.dylib"],
@@ -54,6 +41,7 @@ index b72aacc..4d11ca9 100644
 +            "darwin": ["libarrow.dylib", "libarrow_python.dylib"],
              "win32": ["arrow.lib", "arrow_python.lib"],
          }
+ 
+-- 
+2.34.1
 
---
-2.32.0 (Apple Git-132)
