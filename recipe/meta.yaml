@@ -36,8 +36,7 @@ requirements:
     - patch     # [not win]
     - m2-patch  # [win]
   host:
-    - python  # [not (osx and arm64)]
-    - python 3.9 # [osx and arm64]
+    - python
     - arrow-cpp
     - cython
     - numpy
