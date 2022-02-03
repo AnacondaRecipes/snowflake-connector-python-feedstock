@@ -42,6 +42,7 @@ requirements:
     - numpy
     - pip
     - pyarrow
+    - python-build
     - wheel
     - setuptools >=40.6.0
   run:
