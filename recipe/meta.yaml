@@ -43,7 +43,7 @@ requirements:
     - pip
     - pyarrow
     # python-build is mentioned by the upstream source but it's not clear if it's needed
-    #- python-build
+    - python-build
     - wheel
     - setuptools >=40.6.0
   run:
