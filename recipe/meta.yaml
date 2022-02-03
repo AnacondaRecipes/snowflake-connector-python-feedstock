@@ -10,7 +10,6 @@ source:
   sha256: 12cf177bbc877ad025f5b00ef3779c4eebfdaf472e7912f87c2bcdc9f3864008
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
-    - fix_pyproject.patch  # [osx and arm64]
 
 build:
   number: 0
@@ -23,9 +22,7 @@ build:
     - set SF_NO_COPY_ARROW_LIB=1                 # [win]
     - set "SF_ARROW_LIBDIR=%LIBRARY_LIB%"        # [win]
     - set ENABLE_EXT_MODULES=1                   # [win]
-    - {{ PYTHON }} -m pip install . --no-deps -vvv  # [not (osx and arm64)]
-    - {{ PYTHON }} -m pip list   # [osx and arm64]
-    - {{ PYTHON }} -m pip install . --use-feature=in-tree-build --no-deps -vvv  # [osx and arm64]
+    - {{ PYTHON }} -m pip install . --no-deps -vvv
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
@@ -45,7 +42,8 @@ requirements:
     - numpy
     - pip
     - pyarrow
-    - python-build
+    # python-build is mentioned by the upstream source but it's not clear if it's needed
+    #- python-build
     - wheel
     - setuptools >=40.6.0
   run:
