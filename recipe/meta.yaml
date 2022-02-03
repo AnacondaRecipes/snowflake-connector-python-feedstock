@@ -42,7 +42,7 @@ requirements:
     - arrow-cpp
     - cython
     - numpy
-    - pep517  # [osx and arm64] 
+    - setuptools_scm  # [osx and arm64] 
     - pip
     - pyarrow
     - python-build
