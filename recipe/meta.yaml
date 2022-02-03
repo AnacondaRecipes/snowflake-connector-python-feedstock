@@ -16,9 +16,13 @@ build:
   # Neither on Windows 32-bit nor on s390x there is right now arrow support
   skip: true  # [win32 or s390x or py<36]
   script:
+    - export SF_NO_COPY_ARROW_LIB=1              # [unix]
+    - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
+    - export ENABLE_EXT_MODULES=true             # [unix]
     - set SF_NO_COPY_ARROW_LIB=1                 # [win]
     - set "SF_ARROW_LIBDIR=%LIBRARY_LIB%"        # [win]
     - set ENABLE_EXT_MODULES=1                   # [win]
+    - {{ PYTHON }} -m pip install . --no-deps -vvv
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
@@ -32,7 +36,8 @@ requirements:
     - patch     # [not win]
     - m2-patch  # [win]
   host:
-    - python
+    - python  # [not (osx and arm64)]
+    - python 3.9 # [osx and arm64]
     - arrow-cpp
     - cython
     - numpy
