@@ -10,6 +10,7 @@ source:
   sha256: 12cf177bbc877ad025f5b00ef3779c4eebfdaf472e7912f87c2bcdc9f3864008
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
+    - fix_pyproject.patch  # [osx and arm64]
 
 build:
   number: 0

@@ -1,0 +1,22 @@
+From 2ee68c72c4360d09fc7eccfa2f8b76f577ac7a56 Mon Sep 17 00:00:00 2001
+From: Serhii Kupriienko
+Date: Thu, 3 Feb 2022 16:50:20 +0000
+Subject: [PATCH] Fix pyproject
+
+---
+ pyproject.toml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 5781e59..cf49bfb 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,3 +8,4 @@ requires = [
+     # Must be kept in sync with the `setup_requirements` in `setup.cfg`
+     "pyarrow>=6.0.0,<6.1.0",
+ ]
++build-backend = "setuptools.build_meta"
+\ No newline at end of file
+-- 
+2.34.1
+
