@@ -25,7 +25,7 @@ build:
     - set ENABLE_EXT_MODULES=1                   # [win]
     - {{ PYTHON }} -m pip install . --no-deps -vvv  # [not (osx and arm64)]
     - {{ PYTHON }} -m pip list   # [osx and arm64]
-    - {{ PYTHON }} -m pip install . --no-use-pep517 --use-feature=in-tree-build --no-deps -vvv  # [osx and arm64]
+    - {{ PYTHON }} -m pip install . --use-feature=in-tree-build --no-deps -vvv  # [osx and arm64]
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
