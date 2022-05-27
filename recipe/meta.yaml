@@ -6,8 +6,9 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 9cfb07b048bcb1fe646d03f7480ccb6a877e9c45067302e90bcff7fd72f6bc2f
+  url: https://codeload.github.com/snowflakedb/{{ name }}/tar.gz/v{{ version }}
+  fn: {{ name }}-{{ version }}.tar.gz
+  sha256: 56eb57b69796ee766221d95c6b2de835c20754d6ffa5a4a35f80138355a970bb
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
 
