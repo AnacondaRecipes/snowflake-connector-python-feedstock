@@ -7,14 +7,14 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 56eb57b69796ee766221d95c6b2de835c20754d6ffa5a4a35f80138355a970bb
+  sha256: 9cfb07b048bcb1fe646d03f7480ccb6a877e9c45067302e90bcff7fd72f6bc2f
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
 
 build:
   number: 0
   # neither on Windows 32-bit nor on s390x there is right now arrow support
-  skip: true  # [win32 or s390x or py==310]
+  skip: true  # [win32 or s390x or py<37 or py==310]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -42,19 +42,18 @@ requirements:
     - arrow-cpp
     - pyarrow
     - numpy
+    - setuptools >=40.6.0
+    - wheel
   run:
     - python
     - {{ pin_compatible('pyarrow', max_pin='x') }}
-    - azure-common <2
-    - azure-storage-blob >=12.0.0,<13.0.0
-    - boto3 >=1.4.4,<2.0.0
     # While requests is vendored, we use regular requests to perform OCSP checks
     - requests <3.0.0
     - pytz
     - pycryptodomex >=3.2,!=3.5.0,<4.0.0
-    - pyopenssl >=16.2.0,<22.0.0
+    - pyopenssl >=16.2.0,<23.0.0
     - cffi >=1.9,<2.0.0
-    - cryptography >=3.1.0,<36.0.0
+    - cryptography >=3.1.0,<37.0.0
     - pyjwt <3.0.0
     - oscrypto <2.0.0
     - asn1crypto >0.24.0,<2.0.0
@@ -66,7 +65,6 @@ requirements:
     - charset-normalizer ~=2.0.0
     - idna >=2.5,<4
     - certifi >=2017.4.17
-    - dataclasses <1  # [py<37]
   run_constrained:
     - pandas >1,<1.5
 
