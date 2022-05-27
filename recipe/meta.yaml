@@ -12,9 +12,9 @@ source:
     - 0001-drop-pyarrow-version-numbers.patch
 
 build:
-  number: 0
+  number: 1
   # neither on Windows 32-bit nor on s390x there is right now arrow support
-  skip: true  # [win32 or s390x]
+  skip: true  # [win32 or s390x or py==310]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -76,7 +76,6 @@ test:
   imports:
     - snowflake
     - snowflake.connector
-    - snowflake.connector.arrow_iterator  # [unix]
   commands:
     - pip check
 
