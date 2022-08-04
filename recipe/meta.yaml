@@ -43,10 +43,7 @@ requirements:
     - python
     - pip
     - cython
-    # Snowflake asserts that they rely on only a
-    # small subset of the arrow-cpp API that has
-    # been stable since 0.17
-    - arrow-cpp >=0.17
+    - arrow-cpp >=8,<9
     - pyarrow
     - numpy
     - setuptools >=40.6.0
