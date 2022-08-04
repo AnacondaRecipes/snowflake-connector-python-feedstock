@@ -15,7 +15,7 @@ source:
 
 build:
   number: 0
-  # neither on Windows 32-bit nor on s390x there is right now arrow support
+  # no arrow support on win-32 or s390x
   skip: true  # [win32 or s390x or py<37]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
@@ -43,15 +43,17 @@ requirements:
     - python
     - pip
     - cython
-    - arrow-cpp
+    # Snowflake asserts that they rely on only a
+    # small subset of the arrow-cpp API that has
+    # been stable since 0.17
+    - arrow-cpp >=0.17
     - pyarrow
     - numpy
     - setuptools >=40.6.0
     - wheel
   run:
     - python
-    # the unpatched wheel build vendors arrow-cpp
-    # this recipe breaks that out
+    - pyarrow
     - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
@@ -67,10 +69,9 @@ requirements:
     - idna >=2.5,<4
     - urllib3 >=1.21.1,<1.27
     - certifi >=2017.4.17
-    - typing-extensions >=4,<5
+    - typing-extensions >=4.3.0,<5
   run_constrained:
     - pandas >1,<1.5
-    - {{ pin_compatible('pyarrow', max_pin='x') }}
     - keyring !=16.1.0,<24.0.0
 
 test:
