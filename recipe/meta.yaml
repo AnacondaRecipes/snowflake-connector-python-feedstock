@@ -1,5 +1,6 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "2.7.8" %}
+{% set version = "2.7.11" %}
+{% set sha256 = "e577da63791dbd299629670b199510015361b5e863ff37e083224e39c2f9e73b" %}
 
 package:
   name: {{ name|lower }}
@@ -8,14 +9,14 @@ package:
 source:
   url: https://codeload.github.com/snowflakedb/{{ name }}/tar.gz/v{{ version }}
   fn: {{ name }}-{{ version }}.tar.gz
-  sha256: 56eb57b69796ee766221d95c6b2de835c20754d6ffa5a4a35f80138355a970bb
+  sha256: {{ sha256 }}
   patches:
     - 0001-drop-pyarrow-version-numbers.patch
 
 build:
   number: 0
   # neither on Windows 32-bit nor on s390x there is right now arrow support
-  skip: true  # [win32 or s390x or py<37 or py==310]
+  skip: true  # [win32 or s390x or py<37]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -68,6 +69,8 @@ requirements:
     - certifi >=2017.4.17
   run_constrained:
     - pandas >1,<1.5
+    - pyarrow >=8.0.0,<8.1.0
+    - keyring !=16.1.0,<24.0.0
 
 test:
   requires:
