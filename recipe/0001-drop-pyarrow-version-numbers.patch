@@ -1,5 +1,5 @@
 diff --git a/setup.py b/setup.py
-index d4ccdb7..53472f9 100644
+index d4ccdb7..e273238 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -71,21 +71,21 @@ if _ABLE_TO_COMPILE_EXTENSIONS:
@@ -32,3 +32,17 @@ index d4ccdb7..53472f9 100644
              ],
              "win32": ["arrow.lib", "arrow_python.lib", "parquet.lib"],
          }
+@@ -169,9 +169,11 @@ if _ABLE_TO_COMPILE_EXTENSIONS:
+             link_lib = self.arrow_libs_to_link[sys.platform]
+             ret = []
+ 
++            libdir = self._get_arrow_lib_dir()
++            assert os.path.exists(libdir), f"COULD NOT FIND DIRECTORY: {libdir}"
+             for lib in link_lib:
+-                source = f"{self._get_arrow_lib_dir()}/{lib}"
+-                assert os.path.exists(source)
++                source = f"{libdir}/{lib}"
++                assert os.path.exists(source), '\n'.join([f"COULD NOT FIND LIBRARY: {source}"] + os.listdir(libdir))
+                 ret.append(source)
+ 
+             return ret

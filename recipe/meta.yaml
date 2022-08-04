@@ -22,7 +22,7 @@ build:
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
     - export ENABLE_EXT_MODULES=true             # [unix]
     - set SF_NO_COPY_ARROW_LIB=1                 # [win]
-    - set SF_ARROW_LIBDIR="%LIBRARY_BIN%"        # [win]
+    - set "SF_ARROW_LIBDIR=%PREFIX%\Library"     # [win]
     - set ENABLE_EXT_MODULES=1                   # [win]
     - {{ PYTHON }} -m pip install . --no-deps -vvv
   entry_points:
@@ -30,6 +30,8 @@ build:
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
     - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
     - snowflake-export-certs = snowflake.connector.tool.export_certs:main
+  ignore_run_exports:
+    - arrow-cpp
 
 requirements:
   build:
@@ -48,17 +50,17 @@ requirements:
     - wheel
   run:
     - python
-    - {{ pin_compatible('pyarrow', max_pin='x') }}
+    - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     # While requests is vendored, we use regular requests to perform OCSP checks
-    - requests <3.0.0
-    - pytz
-    - pycryptodomex >=3.2,!=3.5.0,<4.0.0
-    - pyopenssl >=16.2.0,<23.0.0
+    - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0,<37.0.0
-    - pyjwt <3.0.0
     - oscrypto <2.0.0
-    - asn1crypto >0.24.0,<2.0.0
+    - pyopenssl >=16.2.0,<23.0.0
+    - pycryptodomex >=3.2,!=3.5.0,<4.0.0
+    - pyjwt <3.0.0
+    - pytz
+    - requests <3.0.0
     # A functioning pkg_resources.working_set.by_key and pkg_resources.Requirement is
     # required. Python 3.6 was released at the end of 2016. setuptools 34.0.0 was released
     # in early 2017, so we pick this version as a reasonably modern base.
@@ -66,10 +68,12 @@ requirements:
     # requests requirements
     - charset-normalizer ~=2.0.0
     - idna >=2.5,<4
+    - urllib3 >=1.21.1,<1.27
     - certifi >=2017.4.17
+    - typing_extensions >=4.3,<5
   run_constrained:
     - pandas >1,<1.5
-    - pyarrow >=8.0.0,<8.1.0
+    - {{ pin_compatible('pyarrow', max_pin='x') }}
     - keyring !=16.1.0,<24.0.0
 
 test:
@@ -78,6 +82,7 @@ test:
   imports:
     - snowflake
     - snowflake.connector
+    - snowflake.connector.arrow_iterator
   commands:
     - pip check || true  # [not win]
     - pip check || 1  # [win]
