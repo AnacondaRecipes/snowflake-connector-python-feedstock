@@ -80,8 +80,7 @@ test:
     - snowflake.connector
     - snowflake.connector.arrow_iterator
   commands:
-    - pip check || true  # [not win]
-    - pip check || 1  # [win]
+    - pip check
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
