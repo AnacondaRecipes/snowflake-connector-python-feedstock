@@ -1,6 +1,6 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "2.7.11" %}
-{% set sha256 = "e577da63791dbd299629670b199510015361b5e863ff37e083224e39c2f9e73b" %}
+{% set version = "2.7.12" %}
+{% set sha256 = "80d9a43ff29dfbcdc5d40d52c469db1ae47eff8b276e60b63deee674676bea74" %}
 
 package:
   name: {{ name|lower }}
