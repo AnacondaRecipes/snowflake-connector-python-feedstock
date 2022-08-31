@@ -67,6 +67,7 @@ requirements:
     - urllib3 >=1.21.1,<1.27
     - certifi >=2017.4.17
     - typing-extensions >=4.3.0,<5
+    - filelock>=3.5,<4
   run_constrained:
     - pandas >1,<1.5
     - keyring !=16.1.0,<24.0.0
