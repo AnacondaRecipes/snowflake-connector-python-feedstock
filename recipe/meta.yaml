@@ -1,6 +1,7 @@
 {% set name = "snowflake-connector-python" %}
 {% set version = "2.7.12" %}
 {% set sha256 = "80d9a43ff29dfbcdc5d40d52c469db1ae47eff8b276e60b63deee674676bea74" %}
+# rebuild trigger
 
 package:
   name: {{ name|lower }}
