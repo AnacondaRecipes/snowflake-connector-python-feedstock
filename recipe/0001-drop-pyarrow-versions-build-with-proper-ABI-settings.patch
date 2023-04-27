@@ -85,6 +85,26 @@ index 93ff83e2..be80a666 100644
                      if sys.platform == "darwin":
                          ext.extra_compile_args.append("-mmacosx-version-min=10.13")
  
+@@ -198,8 +201,18 @@ if _ABLE_TO_COMPILE_EXTENSIONS:
+             ret = []
 
+             for lib in link_lib:
+-                source = f"{self._get_arrow_lib_dir()}/{lib}"
+-                assert os.path.exists(source)
++                # conda-forge specific fix for arrow 10+
++                # see: https://github.com/conda-forge/arrow-cpp-feedstock/blob/main/recipe/meta.yaml#L279
++                if pyarrow_version[0] >= 10 and "arrow_python" in lib:
++                    try:
++                        source = os.path.join(os.environ['SP_DIR'], 'pyarrow', lib)
++                        assert os.path.exists(source)
++                    except AssertionError:
++                        # os.environ['BUILD_PREFIX'] lib/python3.8/site-packages
++                        source = os.path.join(os.environ['PYTHONPATH'], 'pyarrow', lib)
++                else:
++                    source = os.path.join(self._get_arrow_lib_dir(), lib)
++                assert os.path.exists(source), f"unable to find: {source}"
+                 ret.append(source)
+
+             return ret
 -- 
 2.37.1 (Apple Git-137.1)
