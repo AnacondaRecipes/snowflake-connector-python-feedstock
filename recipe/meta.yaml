@@ -1,7 +1,6 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "2.7.12" %}
-{% set sha256 = "80d9a43ff29dfbcdc5d40d52c469db1ae47eff8b276e60b63deee674676bea74" %}
-# rebuild trigger 2022-09-04
+{% set version = "3.0.3" %}
+{% set sha256 = "bc95fd0e78287d4b16b19f48d936efca75c40833154ec919514d92d460efd532" %}
 
 package:
   name: {{ name|lower }}
@@ -12,7 +11,9 @@ source:
   fn: {{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
   patches:
-    - 0001-drop-pyarrow-version-numbers.patch
+    - 0001-drop-pyarrow-versions-build-with-proper-ABI-settings.patch
+    - 0002-Make-code-compatible-with-older-pyarrow-versions.patch
+    - 0003-Remove-conflicting-Windows-macro.patch
 
 build:
   number: 0
@@ -25,7 +26,7 @@ build:
     - set SF_NO_COPY_ARROW_LIB=1                 # [win]
     - set "SF_ARROW_LIBDIR=%PREFIX%\Library"     # [win]
     - set ENABLE_EXT_MODULES=1                   # [win]
-    - {{ PYTHON }} -m pip install . --no-deps -vvv
+    - {{ PYTHON }} -m pip install . --no-deps -vvv --no-build-isolation --no-deps
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
@@ -44,18 +45,19 @@ requirements:
     - python
     - pip
     - cython
-    - arrow-cpp >=8,<9
+    - arrow-cpp >=10,<11
     - pyarrow
     - numpy
     - setuptools >=40.6.0
     - wheel
   run:
     - python
+    - packaging
     - pyarrow
     - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
-    - cryptography >=3.1.0,<37.0.0
+    - cryptography >=3.1.0,<39.0.0
     - oscrypto <2.0.0
     - pyopenssl >=16.2.0,<23.0.0
     - pycryptodomex >=3.2,!=3.5.0,<4.0.0
@@ -70,7 +72,7 @@ requirements:
     - typing-extensions >=4.3.0,<5
     - filelock>=3.5,<4
   run_constrained:
-    - pandas >1,<1.5
+    - pandas >1,<1.6
     - keyring !=16.1.0,<24.0.0
 
 test:
