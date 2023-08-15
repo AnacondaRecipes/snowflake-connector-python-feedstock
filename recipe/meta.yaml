@@ -1,6 +1,6 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.0.3" %}
-{% set sha256 = "bc95fd0e78287d4b16b19f48d936efca75c40833154ec919514d92d460efd532" %}
+{% set version = "3.1.0" %}
+{% set sha256 = "fb2477b653bd58edd0366b4d6395d109fd4e238b85ce5685d7944455e0d48dab" %}
 
 package:
   name: {{ name|lower }}
@@ -71,9 +71,11 @@ requirements:
     - certifi >=2017.4.17
     - typing-extensions >=4.3.0,<5
     - filelock >=3.5,<4
+    - sortedcontainers >=2.4.0
+    - platformdirs >=2.6.0,<3.9.0
+    - tomlkit
   run_constrained:
-    - pandas >1.0.0,<1.6.0
-    - keyring !=16.1.0,<24.0.0
+    - pandas >1.0.0,<2.1
 
 test:
   requires:
