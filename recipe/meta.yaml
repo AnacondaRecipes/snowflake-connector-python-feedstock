@@ -1,14 +1,14 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.0.3" %}
-{% set sha256 = "bc95fd0e78287d4b16b19f48d936efca75c40833154ec919514d92d460efd532" %}
+{% set version = "3.1.0" %}
+{% set sha256 = "fac51fc5cef6f9d5798aa460f4e6de3e53e1a0fc7b913d2bd98b5ae806bcc83b" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://codeload.github.com/snowflakedb/{{ name }}/tar.gz/v{{ version }}
-  fn: {{ name }}-{{ version }}.tar.gz
+  #url: https://codeload.github.com/snowflakedb/{{ name }}/tar.gz/v{{ version }}
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: {{ sha256 }}
   patches:
     - 0001-drop-pyarrow-versions-build-with-proper-ABI-settings.patch
@@ -18,7 +18,7 @@ source:
 build:
   number: 0
   # no arrow support on win-32 or s390x
-  skip: true  # [win32 or s390x or py<37]
+  skip: true  # [win32 or s390x or py<38]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -26,7 +26,7 @@ build:
     - set SF_NO_COPY_ARROW_LIB=1                 # [win]
     - set "SF_ARROW_LIBDIR=%PREFIX%\Library"     # [win]
     - set ENABLE_EXT_MODULES=1                   # [win]
-    - {{ PYTHON }} -m pip install . --no-deps -vvv --no-build-isolation --no-deps
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
@@ -45,35 +45,37 @@ requirements:
     - python
     - pip
     - cython
-    - arrow-cpp >=10.0.1,<11
-    - pyarrow
-    - numpy
-    - setuptools >=40.6.0
+    - arrow-cpp 10.0.1
+    - pyarrow  10.0.1
+    - numpy  {{ numpy }}
+    - setuptools
     - wheel
   run:
     - python
     - packaging
-    - pyarrow
+    - pyarrow  >=10.0.1,<10.1.0
     - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
-    - cryptography >=3.1.0,<41.0.0
+    - cryptography >=3.1.0,<42.0.0
     - oscrypto <2.0.0
     - pyopenssl >=16.2.0,<24.0.0
     - pycryptodomex >=3.2,!=3.5.0,<4.0.0
     - pyjwt <3.0.0
     - pytz
     - requests <3.0.0
-    - importlib-metadata  # [py<38]
-    - charset-normalizer >=2,<3
+    - charset-normalizer >=2,<4
     - idna >=2.5,<4
     - urllib3 >=1.21.1,<1.27
     - certifi >=2017.4.17
     - typing-extensions >=4.3.0,<5
     - filelock >=3.5,<4
+    - sortedcontainers>=2.4.0
+    - platformdirs>=2.6.0,<3.9.0
+    - tomlkit
   run_constrained:
-    - pandas >1.0.0,<1.6.0
-    - keyring !=16.1.0,<24.0.0
+    - pandas >1.0.0,<2.1.0
+    - keyring !=16.1.0,<25.0.0
 
 test:
   requires:
