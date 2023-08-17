@@ -52,8 +52,6 @@ requirements:
   run:
     - python
     - packaging
-    - pyarrow  >=10.0.1,<10.1.0
-    - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0,<42.0.0
@@ -75,6 +73,8 @@ requirements:
   run_constrained:
     - pandas >1.0.0,<2.1.0
     - keyring !=16.1.0,<25.0.0
+    - pyarrow >=10.0.1,<10.1.0
+    - arrow-cpp >=10.0.1,<10.1.0
 
 test:
   requires:
