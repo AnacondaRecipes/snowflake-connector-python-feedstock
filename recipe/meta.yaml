@@ -13,9 +13,10 @@ source:
     - 0001-drop-pyarrow-versions-build-with-proper-ABI-settings.patch
     - 0002-Make-code-compatible-with-older-pyarrow-versions.patch
     - 0003-Remove-conflicting-Windows-macro.patch
+    - 0004-Remove-warning-about-incompatible-Arrow-version.patch
 
 build:
-  number: 0
+  number: 1
   # no arrow support on win-32 or s390x
   skip: true  # [win32 or s390x or py<38]
   script:
@@ -45,14 +46,14 @@ requirements:
     - pip
     - cython
     - arrow-cpp 10.0.1
-    - pyarrow  10.0.1
-    - numpy  {{ numpy }}
+    - pyarrow 10.0.1
+    - numpy {{ numpy }}
     - setuptools
     - wheel
   run:
     - python
     - packaging
-    - pyarrow  >=10.0.1,<10.1.0
+    - pyarrow >=10.0.1,<10.1.0
     - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
