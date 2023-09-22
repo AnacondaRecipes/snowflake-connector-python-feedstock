@@ -13,12 +13,11 @@ source:
     - 0001-drop-pyarrow-versions-build-with-proper-ABI-settings.patch
     - 0002-Make-code-compatible-with-older-pyarrow-versions.patch
     - 0003-Remove-conflicting-Windows-macro.patch
-    - 0004-Remove-warning-about-incompatible-Arrow-version.patch
 
 build:
   number: 1
-  # no arrow support on win-32 or s390x
-  skip: true  # [win32 or s390x or py<38]
+  # no arrow support on s390x
+  skip: true  # [s390x or py<38]
   script:
     - export SF_NO_COPY_ARROW_LIB=1              # [unix]
     - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
@@ -78,12 +77,12 @@ requirements:
     - keyring !=16.1.0,<25.0.0
 
 test:
-  requires:
-    - pip
   imports:
     - snowflake
     - snowflake.connector
     - snowflake.connector.arrow_iterator
+  requires:
+    - pip
   commands:
     - pip check
 
