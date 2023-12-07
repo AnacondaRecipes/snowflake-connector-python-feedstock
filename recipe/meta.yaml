@@ -53,7 +53,6 @@ requirements:
   run_constrained:
     - pandas >1.0.0,<2.1.0
     - keyring !=16.1.0,<25.0.0
-    - numpy <1.27
 
 test:
   imports:
