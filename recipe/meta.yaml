@@ -1,6 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.2.0" %}
-{% set sha256 = "676a0dca16de7c120900aa1a5fce6440833b0a60f76682b7ccf1667967282ca3" %}
+{% set version = "3.5.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,79 +7,59 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
-  patches:
-    - 0001-drop-pyarrow-versions-build-with-proper-ABI-settings.patch
-    - 0002-Make-code-compatible-with-older-pyarrow-versions.patch
-    - 0003-Remove-conflicting-Windows-macro.patch
-
+  sha256: 654e4a1f68a491544bd8f7c5ab02eb8531df67c5f4309d5253bd204044f8a1b3
+  
 build:
-  number: 1
-  # no arrow support on s390x
+  number: 0
+  # s390x not needed for snowflake
   skip: true  # [s390x or py<38]
   script:
-    - export SF_NO_COPY_ARROW_LIB=1              # [unix]
-    - export SF_ARROW_LIBDIR="${PREFIX}/lib"     # [unix]
-    - export ENABLE_EXT_MODULES=true             # [unix]
-    - set SF_NO_COPY_ARROW_LIB=1                 # [win]
-    - set "SF_ARROW_LIBDIR=%PREFIX%\Library"     # [win]
-    - set ENABLE_EXT_MODULES=1                   # [win]
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
     - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
     - snowflake-export-certs = snowflake.connector.tool.export_certs:main
-  ignore_run_exports:
-    - arrow-cpp
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - patch     # [not win]
-    - m2-patch  # [win]
   host:
     - python
     - pip
     - cython
-    - arrow-cpp 10.0.1
-    - pyarrow 10.0.1
-    - numpy {{ numpy }}
     - setuptools
     - wheel
   run:
     - python
     - packaging
-    - pyarrow >=10.0.1,<10.1.0
-    - {{ pin_compatible('arrow-cpp', max_pin='x') }}
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0,<42.0.0
-    - oscrypto <2.0.0
     - pyopenssl >=16.2.0,<24.0.0
-    - pycryptodomex >=3.2,!=3.5.0,<4.0.0
     - pyjwt <3.0.0
     - pytz
     - requests <3.0.0
     - charset-normalizer >=2,<4
     - idna >=2.5,<4
-    - urllib3 >=1.21.1,<1.27
+    - urllib3 >=1.21.1,<2.0.0
     - certifi >=2017.4.17
     - typing-extensions >=4.3.0,<5
     - filelock >=3.5,<4
     - sortedcontainers >=2.4.0
-    - platformdirs >=2.6.0,<3.9.0
+    - platformdirs >=2.6.0,<4.0.0
     - tomlkit
   run_constrained:
     - pandas >1.0.0,<2.1.0
     - keyring !=16.1.0,<25.0.0
+    - numpy <1.27
 
 test:
   imports:
     - snowflake
     - snowflake.connector
-    - snowflake.connector.arrow_iterator
+    - snowflake.connector.nanoarrow_arrow_iterator
   requires:
     - pip
   commands:
