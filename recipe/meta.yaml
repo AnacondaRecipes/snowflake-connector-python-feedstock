@@ -33,7 +33,6 @@ requirements:
     - wheel
   run:
     - python
-    - packaging
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0,<42.0.0
