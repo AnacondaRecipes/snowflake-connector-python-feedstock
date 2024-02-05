@@ -1,1 +1,6 @@
 aggregate_branch: 3.12
+
+channels:
+  jcmorin-ana-org: snowflake
+
+upload_without_merge: true
