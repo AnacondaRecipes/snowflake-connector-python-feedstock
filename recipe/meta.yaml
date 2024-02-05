@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.5.0" %}
+{% set version = "3.7.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 654e4a1f68a491544bd8f7c5ab02eb8531df67c5f4309d5253bd204044f8a1b3
+  sha256: b2bfaec64059307b08caadad40214d488fefb4a23fcd7553ac75f5ea758a9169
   
 build:
   number: 0
@@ -41,9 +41,11 @@ requirements:
     - pyjwt <3.0.0
     - pytz
     - requests <3.0.0
+    - importlib-metadata  # [py<38]
+    - packaging
     - charset-normalizer >=2,<4
     - idna >=2.5,<4
-    - urllib3 >=1.21.1,<2.0.0
+    - urllib3 >=1.21.1,<2.0.0  # [py<310]
     - certifi >=2017.4.17
     - typing-extensions >=4.3.0,<5
     - filelock >=3.5,<4
@@ -51,7 +53,7 @@ requirements:
     - platformdirs >=2.6.0,<4.0.0
     - tomlkit
   run_constrained:
-    - pandas >1.0.0,<2.1.0
+    - pandas >=1.0.0,<2.2.0
     - keyring !=16.1.0,<25.0.0
 
 test:
@@ -68,7 +70,9 @@ about:
   home: https://github.com/snowflakedb/snowflake-connector-python
   license: Apache-2.0
   license_family: Apache
-  license_file: LICENSE.txt
+  license_file:
+    - LICENSE.txt
+    - NOTICE
   summary: Snowflake Connector for Python
   description: |
     The Snowflake Connector for Python provides an interface for
