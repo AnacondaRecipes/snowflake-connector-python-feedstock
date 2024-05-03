@@ -1,13 +1,13 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.7.0" %}
+{% set version = "3.10.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: b2bfaec64059307b08caadad40214d488fefb4a23fcd7553ac75f5ea758a9169
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name|lower|replace("-","_") }}-{{ version }}.tar.gz
+  sha256: 7c7438e958753bd1174b73581d77c92b0b47a86c38d8ea0ba1ea23c442eb8e75
   
 build:
   number: 0
@@ -35,8 +35,8 @@ requirements:
     - python
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
-    - cryptography >=3.1.0,<42.0.0
-    - pyopenssl >=16.2.0,<24.0.0
+    - cryptography >=3.1.0,<43.0.0
+    - pyopenssl >=16.2.0,<25.0.0
     - pyjwt <3.0.0
     - pytz
     - requests <3.0.0
@@ -46,14 +46,14 @@ requirements:
     - idna >=2.5,<4
     - urllib3 >=1.21.1,<2.0.0  # [py<310]
     - certifi >=2017.4.17
-    - typing-extensions >=4.3.0,<5
+    - typing-extensions >=4.3,<5
     - filelock >=3.5,<4
     - sortedcontainers >=2.4.0
-    - platformdirs >=2.6.0,<4.0.0
+    - platformdirs >=2.6.0,<5.0.0
     - tomlkit
   run_constrained:
-    - pandas >=1.0.0,<2.2.0
-    - keyring !=16.1.0,<25.0.0
+    - pandas >=1.0.0,<3.0.0
+    - keyring >=23.1.0,<25.0.0
 
 test:
   imports:
