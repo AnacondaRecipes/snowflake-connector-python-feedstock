@@ -6,8 +6,8 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name|lower|replace("-","_") }}-{{ version }}.tar.gz
-  sha256: b9214da76ce72fff8eb60066fde6b9ba7f58a055d68ffe1e7a9b1034f57a34b4
+  url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: 695992d4540379a8f3a8d3157eadecf3a5fe606e85c424a3080b10b93a3c429c
   
 build:
   number: 0
@@ -55,6 +55,17 @@ requirements:
     - pandas >=1.0.0,<3.0.0
     - keyring >=23.1.0,<25.0.0
 
+# ignore these unit tests because they use relative imports
+# or not found modules (existing but not well configured).
+{% set tests_to_ignore = " --ignore=test/unit/test_configmanager.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_connection.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_encryption_util.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_error_arrow_stream.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_result_batch.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_s3_util.py" %}
+# ignore this test because it takes a lot (retry/timeout network tests)
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_retry_network.py" %}
+
 test:
   imports:
     - snowflake
@@ -62,8 +73,13 @@ test:
     - snowflake.connector.nanoarrow_arrow_iterator
   requires:
     - pip
+    - pytest
+  source_files:
+    - test/unit
+    - test/data/cert_tests/incomplete-chain.pem
   commands:
     - pip check
+    - pytest -v test/unit {{ tests_to_ignore }}
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
