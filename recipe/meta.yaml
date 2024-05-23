@@ -66,6 +66,13 @@ requirements:
 # ignore this test because it takes a lot (retry/timeout network tests)
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_retry_network.py" %}
 
+{% set tests_to_deselect = "" %}
+# linux: deselect the following tests because file permissions 
+# will not be set correctly and with DID NOT RAISE PermissionError
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}        # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}                           # [linux]
+
 test:
   imports:
     - snowflake
@@ -79,7 +86,7 @@ test:
     - test/data/cert_tests/incomplete-chain.pem
   commands:
     - pip check
-    - pytest -v test/unit {{ tests_to_ignore }}
+    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
