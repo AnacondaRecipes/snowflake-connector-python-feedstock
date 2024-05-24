@@ -1,13 +1,13 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.10.0" %}
+{% set version = "3.10.1" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name|lower|replace("-","_") }}-{{ version }}.tar.gz
-  sha256: 7c7438e958753bd1174b73581d77c92b0b47a86c38d8ea0ba1ea23c442eb8e75
+  url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: 695992d4540379a8f3a8d3157eadecf3a5fe606e85c424a3080b10b93a3c429c
   
 build:
   number: 0
@@ -55,6 +55,24 @@ requirements:
     - pandas >=1.0.0,<3.0.0
     - keyring >=23.1.0,<25.0.0
 
+# ignore these unit tests because they use relative imports
+# or not found modules (existing but not well configured).
+{% set tests_to_ignore = " --ignore=test/unit/test_configmanager.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_connection.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_encryption_util.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_error_arrow_stream.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_result_batch.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_s3_util.py" %}
+# ignore this test because it takes a lot (retry/timeout network tests)
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_retry_network.py" %}
+
+{% set tests_to_deselect = "" %}
+# linux: deselect the following tests because file permissions 
+# will not be set correctly and fail with DID NOT RAISE PermissionError
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}        # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}                           # [linux]
+
 test:
   imports:
     - snowflake
@@ -62,8 +80,13 @@ test:
     - snowflake.connector.nanoarrow_arrow_iterator
   requires:
     - pip
+    - pytest
+  source_files:
+    - test/unit
+    - test/data/cert_tests/incomplete-chain.pem
   commands:
     - pip check
+    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
