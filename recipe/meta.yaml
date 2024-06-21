@@ -1,13 +1,14 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.10.1" %}
+{% set version = "3.11.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
+  # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 695992d4540379a8f3a8d3157eadecf3a5fe606e85c424a3080b10b93a3c429c
+  sha256: 51bf7f17db2303ce470928a85eb15c781a3219c035b2cb7643c779ab918a9f99
   
 build:
   number: 0
@@ -57,7 +58,9 @@ requirements:
 
 # ignore these unit tests because they use relative imports
 # or not found modules (existing but not well configured).
-{% set tests_to_ignore = " --ignore=test/unit/test_configmanager.py" %}
+{% set tests_to_ignore = "" %}
+# update: they still fail for 3.11.0
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_configmanager.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_connection.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_encryption_util.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_error_arrow_stream.py" %}
@@ -69,6 +72,7 @@ requirements:
 {% set tests_to_deselect = "" %}
 # linux: deselect the following tests because file permissions 
 # will not be set correctly and fail with DID NOT RAISE PermissionError
+# update: they still fail for 3.11.0
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}        # [linux]
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}                           # [linux]
@@ -90,8 +94,9 @@ test:
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
-  license: Apache-2.0
-  license_family: Apache
+  # MIT: src/snowflake/connector/vendored/urllib3/LICENSE.txt
+  license: Apache-2.0 AND MIT
+  license_family: Other
   license_file:
     - LICENSE.txt
     - NOTICE
