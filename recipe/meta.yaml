@@ -54,7 +54,7 @@ requirements:
     - tomlkit
   run_constrained:
     - pandas >=1.0.0,<3.0.0
-    - keyring >=23.1.0,<25.0.0
+    - keyring >=23.1.0,<26.0.0
 
 # ignore these unit tests because they use relative imports
 # or not found modules (existing but not well configured).
