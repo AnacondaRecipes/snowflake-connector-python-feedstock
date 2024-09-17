@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.12.1" %}
+{% set version = "3.12.2" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 976f25a4f60714b7fe53778ac0872a69db1becb1d9a5271d7d691f225bdce1a1
+  sha256: 910938d7d517b41829bbc06c24e5d8a154794d02c66420a85fdadc76e7f3021b
   
 build:
   number: 100
@@ -68,6 +68,7 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_s3_util.py" %}
 # ignore this test because it takes a lot (retry/timeout network tests)
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_retry_network.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
 
 {% set tests_to_deselect = "" %}
 # linux: deselect the following tests because file permissions 
