@@ -78,6 +78,7 @@ test:
   imports:
     - snowflake
     - snowflake.connector
+    - snowflake.connector.auth
     - snowflake.connector.nanoarrow_arrow_iterator
   requires:
     - pip
@@ -87,6 +88,9 @@ test:
     - test/data/cert_tests/incomplete-chain.pem
   commands:
     - pip check
+    - snowflake-dump-ocsp-response --help
+    - snowflake-dump-ocsp-response-cache --help
+    - snowflake-dump-certs --help
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
 
