@@ -89,10 +89,10 @@ test:
   commands:
     - pip check
     # These tools will only output the `help` if less args than expected are given
-    # So we call them with no args
-    - snowflake-dump-ocsp-response
-    - snowflake-dump-ocsp-response-cache
-    - snowflake-dump-certs
+    # So we call them with no args, and expect return code 2, which they will return when no args are provided
+    - snowflake-dump-ocsp-response || true
+    - snowflake-dump-ocsp-response-cache || true
+    - snowflake-dump-certs || true
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
 
