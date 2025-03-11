@@ -60,6 +60,16 @@ requirements:
 # This file is excluded from the release tarball. Just ignore this test.
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_wiremock_client.py" %}
 
+{% set tests_to_deselect = "" %}
+# linux: deselect the following tests because file permissions will not be set correctly and fail with DID NOT RAISE PermissionError.
+#   >  with pytest.raises(PermissionError) as e:
+#   E: Failed: DID NOT RAISE <class 'PermissionError'>
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_warn_config_file_owner" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}  # [linux]
+
 test:
   imports:
     - snowflake
