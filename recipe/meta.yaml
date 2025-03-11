@@ -84,7 +84,7 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v test/unit {{ tests_to_ignore }}
+    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
