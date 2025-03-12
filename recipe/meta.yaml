@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.13.2" %}
+{% set version = "3.14.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 11b48de078f603058a64154d3a6191f52564479a52ce26b7e88ecc3ded8ee4a4
+  sha256: e9b467902e0746a5bc3b64dc19ea2ae58af856e4244c695eb040294e0ec7463a
   
 build:
   number: 100
@@ -29,14 +29,14 @@ requirements:
     - python
     - pip
     - cython
-    - setuptools
+    - setuptools >=40.6.0
     - wheel
   run:
     - python
     - asn1crypto >0.24.0,<2.0.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0
-    - pyopenssl >=22.0.0,<25.0.0
+    - pyopenssl >=22.0.0,<26.0.0
     - pyjwt <3.0.0
     - pytz
     - requests <3.0.0
@@ -52,27 +52,23 @@ requirements:
     - tomlkit
   run_constrained:
     - pandas >=1.0.0,<3.0.0
+    - pyarrow <19.0.0
     - keyring >=23.1.0,<26.0.0
 
 {% set tests_to_ignore = "" %}
-# ignore these unit tests because they use relative imports
-# or not found modules (existing but not well configured).
-# update: they still fail for 3.13.0
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_configmanager.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_connection.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_encryption_util.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_error_arrow_stream.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_result_batch.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_s3_util.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
+# AssertionError: $SRC_DIR/.wiremock/wiremock-standalone.jar does not exist.
+# This file is excluded from the release tarball. Just ignore this test.
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_wiremock_client.py" %}
 
 {% set tests_to_deselect = "" %}
-# linux: deselect the following tests because file permissions 
-# will not be set correctly and fail with DID NOT RAISE PermissionError
-# update: they still fail for 3.13.0
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}        # [linux]
+# linux: deselect the following tests because file permissions will not be set correctly and fail with DID NOT RAISE PermissionError.
+#   >  with pytest.raises(PermissionError) as e:
+#   E: Failed: DID NOT RAISE <class 'PermissionError'>
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}  # [linux]
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}                           # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_warn_config_file_owner" %}  # [linux]
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}  # [linux]
 
 test:
   imports:
@@ -84,8 +80,7 @@ test:
     - pip
     - pytest
   source_files:
-    - test/unit
-    - test/data/cert_tests/incomplete-chain.pem
+    - test
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
