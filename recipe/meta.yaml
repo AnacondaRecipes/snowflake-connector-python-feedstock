@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.14.0" %}
+{% set version = "3.14.1" %}
 
 package:
   name: {{ name|lower }}
@@ -8,12 +8,11 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: e9b467902e0746a5bc3b64dc19ea2ae58af856e4244c695eb040294e0ec7463a
+  sha256: 87de09a6a224f095dc25caf17c40c36d076cfdeca34598b0671b792886ed765e
   
 build:
   number: 100
-  # s390x not needed for snowflake
-  skip: true  # [s390x or py<38]
+  skip: true  # [py<39]
   script:
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
@@ -34,6 +33,8 @@ requirements:
   run:
     - python
     - asn1crypto >0.24.0,<2.0.0
+    - boto3 >=1.0
+    - botocore >=1.0
     - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0
     - pyopenssl >=22.0.0,<26.0.0
@@ -51,7 +52,7 @@ requirements:
     - platformdirs >=2.6.0,<5.0.0
     - tomlkit
   run_constrained:
-    - pandas >=1.0.0,<3.0.0
+    - pandas >=2.1.2,<3.0.0
     - pyarrow <19.0.0
     - keyring >=23.1.0,<26.0.0
 
@@ -59,6 +60,10 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock/wiremock-standalone.jar does not exist.
 # This file is excluded from the release tarball. Just ignore this test.
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_wiremock_client.py" %}
+# AssertionError: $SRC_DIR/.wiremock does not exist
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit//test_oauth_token.py" %}
+# Using relative import
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
 
 {% set tests_to_deselect = "" %}
 # linux: deselect the following tests because file permissions will not be set correctly and fail with DID NOT RAISE PermissionError.
@@ -69,6 +74,11 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}  # [linux]
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_warn_config_file_owner" %}  # [linux]
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}  # [linux]
+# AssertionError: $SRC_DIR/.wiremock does not exist
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
+# Using relative import
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_converter.py::test_decfloat_to_decimal_converter" %}
 
 test:
   imports:
