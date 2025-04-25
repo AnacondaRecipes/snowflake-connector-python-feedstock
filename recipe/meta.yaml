@@ -86,6 +86,12 @@ test:
     - snowflake.connector
     - snowflake.connector.auth
     - snowflake.connector.nanoarrow_arrow_iterator
+    - snowflake.connector.externals_utils
+    - snowflake.connector.logging_utils
+    - snowflake.connector.tool
+    - snowflake.connector.vendored
+    - snowflake.connector.vendored.requests
+    - snowflake.connector.vendored.urllib3
   requires:
     - pip
     - pytest
