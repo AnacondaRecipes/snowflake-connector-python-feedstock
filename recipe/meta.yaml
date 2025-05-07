@@ -11,7 +11,7 @@ source:
   sha256: a7ae82f22adf30d0b802922311abc42669ad3ec3f4e7adc69395b753a6f1a0ac
   
 build:
-  number: 100
+  number: 101
   skip: true  # [py<39]
   script:
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
@@ -52,7 +52,6 @@ requirements:
     - platformdirs >=2.6.0,<5.0.0
     - tomlkit
   run_constrained:
-    - pandas >=2.1.2,<3.0.0
     - pyarrow <19.0.0
     - keyring >=23.1.0,<26.0.0
 
