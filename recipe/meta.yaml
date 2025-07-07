@@ -130,6 +130,7 @@ test:
   requires:
     - pip
     - pytest
+    - numpy
   source_files:
     - test
   commands:
