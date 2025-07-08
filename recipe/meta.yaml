@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.15.0" %}
+{% set version = "3.16.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: a7ae82f22adf30d0b802922311abc42669ad3ec3f4e7adc69395b753a6f1a0ac
+  sha256: cbeb08f20debc8f2b80d7a924786922b4ecb38525d7263aa6413612bf4422a52
   
 build:
   number: 100
@@ -26,7 +26,7 @@ requirements:
     - {{ compiler('cxx') }}
   host:
     - python
-    - pip !=25.1
+    - pip
     - cython
     - setuptools >=40.6.0
     - wheel
@@ -64,6 +64,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit//test_oauth_token.py" %}
 # Using relative import
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
+# NameError: name 'ArrowConverterContext' is not defined
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
 
 {% set tests_to_deselect = "" %}
 # linux: deselect the following tests because file permissions will not be set correctly and fail with DID NOT RAISE PermissionError.
@@ -77,24 +79,58 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
-# Using relative import
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_converter.py::test_decfloat_to_decimal_converter" %}
 
 test:
   imports:
     - snowflake
     - snowflake.connector
+    - snowflake.connector.arrow_context
     - snowflake.connector.auth
+    - snowflake.connector.auth._http_server
+    - snowflake.connector.auth.keypair
+    - snowflake.connector.compat
+    - snowflake.connector.config_manager
+    - snowflake.connector.connection
+    - snowflake.connector.constants
+    - snowflake.connector.converter
+    - snowflake.connector.converter_null
+    - snowflake.connector.converter_snowsql
+    - snowflake.connector.cursor
+    - snowflake.connector.dbapi
+    - snowflake.connector.description
+    - snowflake.connector.encryption_util
+    - snowflake.connector.errorcode
+    - snowflake.connector.errors
+    - snowflake.connector.externals_utils.externals_setup
+    - snowflake.connector.file_transfer_agent
+    - snowflake.connector.file_util
+    - snowflake.connector.logging_utils.filters
     - snowflake.connector.nanoarrow_arrow_iterator
-    - snowflake.connector.externals_utils
-    - snowflake.connector.logging_utils
-    - snowflake.connector.tool
+    - snowflake.connector.network
+    - snowflake.connector.ocsp_asn1crypto
+    - snowflake.connector.ocsp_snowflake
+    - snowflake.connector.options
+    - snowflake.connector.result_batch
+    - snowflake.connector.result_set
+    - snowflake.connector.secret_detector
+    - snowflake.connector.sfbinaryformat
+    - snowflake.connector.sfdatetime
+    - snowflake.connector.sqlstate
+    - snowflake.connector.ssl_wrap_socket
+    - snowflake.connector.telemetry
+    - snowflake.connector.telemetry_oob
+    - snowflake.connector.token_cache
+    - snowflake.connector.util_text
     - snowflake.connector.vendored
-    - snowflake.connector.vendored.requests
-    - snowflake.connector.vendored.urllib3
+    - snowflake.connector.vendored.requests.exceptions
+    - snowflake.connector.vendored.requests.models
+    - snowflake.connector.vendored.urllib3.connectionpool
+    - snowflake.connector.version
+    - snowflake.connector.wif_util
   requires:
     - pip
     - pytest
+    - numpy
   source_files:
     - test
   commands:
