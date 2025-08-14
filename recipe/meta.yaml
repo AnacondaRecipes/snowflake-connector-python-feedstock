@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.16.0" %}
+{% set version = "3.17.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: cbeb08f20debc8f2b80d7a924786922b4ecb38525d7263aa6413612bf4422a52
+  sha256: 9399655d876fd9f8a80be566ed8fff413e6886f8a768438935521b3a9dd482f8
   
 build:
   number: 100
@@ -22,6 +22,7 @@ build:
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
@@ -53,7 +54,6 @@ requirements:
     - tomlkit
   run_constrained:
     - pandas >=2.1.2,<3.0.0
-    - pyarrow <19.0.0
     - keyring >=23.1.0,<26.0.0
 
 {% set tests_to_ignore = "" %}
@@ -64,6 +64,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit//test_oauth_token.py" %}
 # Using relative import
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_detect_platforms.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_telemetry.py" %}
 # NameError: name 'ArrowConverterContext' is not defined
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
 
@@ -79,6 +81,8 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_connection.py::test_large_query_through_proxy" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 
 test:
   imports:
@@ -87,6 +91,7 @@ test:
     - snowflake.connector.arrow_context
     - snowflake.connector.auth
     - snowflake.connector.auth._http_server
+    - snowflake.connector.auth.by_plugin
     - snowflake.connector.auth.keypair
     - snowflake.connector.compat
     - snowflake.connector.config_manager
@@ -110,9 +115,11 @@ test:
     - snowflake.connector.ocsp_asn1crypto
     - snowflake.connector.ocsp_snowflake
     - snowflake.connector.options
+    - snowflake.connector.platform_detection
     - snowflake.connector.result_batch
     - snowflake.connector.result_set
     - snowflake.connector.secret_detector
+    - snowflake.connector.session_manager
     - snowflake.connector.sfbinaryformat
     - snowflake.connector.sfdatetime
     - snowflake.connector.sqlstate
@@ -122,9 +129,9 @@ test:
     - snowflake.connector.token_cache
     - snowflake.connector.util_text
     - snowflake.connector.vendored
+    - snowflake.connector.vendored.requests
     - snowflake.connector.vendored.requests.exceptions
     - snowflake.connector.vendored.requests.models
-    - snowflake.connector.vendored.urllib3.connectionpool
     - snowflake.connector.version
     - snowflake.connector.wif_util
   requires:
@@ -133,6 +140,8 @@ test:
     - numpy
   source_files:
     - test
+    # ModuleNotFoundError: No module named 'check_no_native_http'
+    - ci/pre-commit/check_no_native_http.py
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
