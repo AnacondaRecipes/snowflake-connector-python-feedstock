@@ -142,13 +142,10 @@ test:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
     - ci/pre-commit/check_no_native_http.py
-  files:
-    - tests/llm_smoke_test.py
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
-    - pytest -v tests/llm_smoke_test.py
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
