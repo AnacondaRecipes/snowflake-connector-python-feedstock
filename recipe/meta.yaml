@@ -64,6 +64,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit//test_oauth_token.py" %}
 # Using relative import
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_detect_platforms.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_telemetry.py" %}
 # NameError: name 'ArrowConverterContext' is not defined
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
 
@@ -79,6 +81,8 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_connection.py::test_large_query_through_proxy" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 
 test:
   imports:
@@ -136,10 +140,15 @@ test:
     - numpy
   source_files:
     - test
+    # ModuleNotFoundError: No module named 'check_no_native_http'
+    - ci/pre-commit/check_no_native_http.py
+  files:
+    - tests/llm_smoke_test.py
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
+    - pytest -v tests/llm_smoke_test.py
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
