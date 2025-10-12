@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "3.18.0" %}
+{% set version = "4.0.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,17 +8,21 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: b0a656784e05289bdf8ed6b8d4cb6d01b141c645c91f15a1a6840499febd986c
+  sha256: 130b9a7e32d5348c3bb1a6067e830f79bb9a08190d8b75cc7807437422648916
   
 build:
   number: 100
   skip: true  # [py<39]
+  script_env:
+    - SNOWFLAKE_NO_BOTO=1
   script:
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
     - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
+  ignore_run_exports:
+    - libcxx
 
 requirements:
   build:
@@ -34,9 +38,6 @@ requirements:
   run:
     - python
     - asn1crypto >0.24.0,<2.0.0
-    - boto3 >=1.24
-    - botocore >=1.24
-    - cffi >=1.9,<2.0.0
     - cryptography >=3.1.0
     - pyopenssl >=22.0.0,<26.0.0
     - pyjwt <3.0.0
@@ -53,6 +54,8 @@ requirements:
     - platformdirs >=2.6.0,<5.0.0
     - tomlkit
   run_constrained:
+    - boto3 >=1.24
+    - botocore >=1.24
     - pandas >=2.1.2,<3.0.0
     - keyring >=23.1.0,<26.0.0
 
@@ -73,11 +76,11 @@ requirements:
 # linux: deselect the following tests because file permissions will not be set correctly and fail with DID NOT RAISE PermissionError.
 #   >  with pytest.raises(PermissionError) as e:
 #   E: Failed: DID NOT RAISE <class 'PermissionError'>
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}  # [linux]
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}  # [linux]
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_warn_config_file_owner" %}  # [linux]
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}  # [linux]
+# {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::TestSFDictFileCache::test_read_only" %}  # [linux]
+# {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_easy_logging.py::test_config_file_inaccessible_path" %}  # [linux]
+# {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_put_get.py::test_put_error" %}  # [linux]
+# {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_warn_config_file_owner" %}  # [linux]
+# {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}  # [linux]
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
@@ -143,11 +146,17 @@ test:
     - pip
     - pytest
     - numpy
+    - responses
+    - boto3 >=1.24
+    - botocore >=1.24
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
     - ci/pre-commit/check_no_native_http.py
   commands:
+  # + pip check
+  # snowflake-connector-python 4.0.0 requires boto3, which is not installed.
+  # snowflake-connector-python 4.0.0 requires botocore, which is not installed.
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
     - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
