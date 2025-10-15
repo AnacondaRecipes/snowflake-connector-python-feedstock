@@ -136,8 +136,6 @@ test:
     - pytest
     - numpy
     - responses
-    - boto3 >=1.24
-    - botocore >=1.24
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
