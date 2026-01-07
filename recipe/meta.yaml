@@ -146,7 +146,6 @@ test:
     - pytest
     - numpy
     - responses
-    - aiohttp
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
