@@ -19,6 +19,11 @@ build:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
     - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
+  # libc.musl-xxx.so.1 is not available on our CI linux distribution (will be on ALPINE linux instead of glibc)
+  # https://github.com/snowflakedb/snowflake-connector-python/blob/aaa214835278e5b47db7b985642ca5ed880ebfda/src/snowflake/connector/_utils.py#L175-L197
+  missing_dso_whitelist: # [linux]
+    - $RPATH/libc.musl-aarch64.so.1  # [linux]
+    - $RPATH/libc.musl-x86_64.so.1  # [linux]
 
 requirements:
   build:
