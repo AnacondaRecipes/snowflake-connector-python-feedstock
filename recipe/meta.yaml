@@ -24,6 +24,8 @@ build:
   missing_dso_whitelist: # [linux]
     - $RPATH/libc.musl-aarch64.so.1  # [linux]
     - $RPATH/libc.musl-x86_64.so.1  # [linux]
+    # For some reason on aarch64 linux_x86_64_glibc/libsf_mini_core.so is also built so ld is missing for x86
+    - $RPATH/ld-linux-x86-64.so.2  # [linux and aarch64]
 
 requirements:
   build:
@@ -87,6 +89,8 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
 # E       AssertionError: assert 'due to no permission on its parent directory' in ''
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
+# CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
 
 # !!! TODO: check next version bump
 # raise ImportError("aio is not supported in this version of the connector")
