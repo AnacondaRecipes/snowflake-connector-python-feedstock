@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.1.1" %}
+{% set version = "4.2.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 9a03043eb33c7725036d8cc9b8439e1db0a742e7df6afa926379b820608a47f8
+  sha256: 4fe89a615a9d303c67a094ada269a2ecbec43065064be0368ae90656e5813143
 
 build:
   number: 100
@@ -19,6 +19,13 @@ build:
     - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
     - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
     - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
+  # libc.musl-xxx.so.1 is not available on our CI linux distribution (will be on ALPINE linux instead of glibc)
+  # https://github.com/snowflakedb/snowflake-connector-python/blob/aaa214835278e5b47db7b985642ca5ed880ebfda/src/snowflake/connector/_utils.py#L175-L197
+  missing_dso_whitelist: # [linux]
+    - $RPATH/libc.musl-aarch64.so.1  # [linux]
+    - $RPATH/libc.musl-x86_64.so.1  # [linux]
+    # For some reason on aarch64 linux_x86_64_glibc/libsf_mini_core.so is also built so ld is missing for x86
+    - $RPATH/ld-linux-x86-64.so.2  # [linux and aarch64]
 
 requirements:
   build:
@@ -80,6 +87,15 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+# E       AssertionError: assert 'due to no permission on its parent directory' in ''
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
+# CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
+
+# !!! TODO: check next version bump
+# raise ImportError("aio is not supported in this version of the connector")
+# https://github.com/snowflakedb/snowflake-connector-python/compare/v4.1.1...v4.2.0#diff-cee0e379944a8144da97a08f1c0b649942128eb1a9ea653a003d3a887899e61cR3-R4
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio" %}
 
 test:
   imports:
