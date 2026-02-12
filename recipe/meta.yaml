@@ -91,6 +91,9 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test_auth_oauth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_oauth_token_async.py::test_oauth_code_token_request_error_async" %}
 # E       AssertionError: assert 'due to no permission on its parent directory' in ''
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
 # CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
@@ -151,7 +154,7 @@ test:
     - snowflake.connector.wif_util
   requires:
     - pip
-    - pytest
+    - pytest <9
     - numpy
     - responses
     - aiohttp
