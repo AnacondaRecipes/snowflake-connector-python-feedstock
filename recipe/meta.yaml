@@ -80,6 +80,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
 # E   ModuleNotFoundError: No module named 'src'
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_telemetry_async.py" %}
+# E   RuntimeError: There is no current event loop in thread 'MainThread'.
+# {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_connection_async_unit.py" %}  # [py==314]
 
 {% set tests_to_deselect = "" %}
 # AssertionError: $SRC_DIR/.wiremock does not exist
@@ -93,7 +95,6 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
 # CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
-    # raise RuntimeError('There is no current event loop in thread %r.'
 
 test:
   imports:
@@ -154,7 +155,7 @@ test:
     - numpy
     - responses
     - aiohttp
-    - pytest-asyncio
+    - pytest-tornasync
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
