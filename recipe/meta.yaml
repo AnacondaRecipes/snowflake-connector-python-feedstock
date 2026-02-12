@@ -25,7 +25,7 @@ build:
     - $RPATH/libc.musl-aarch64.so.1  # [linux]
     - $RPATH/libc.musl-x86_64.so.1  # [linux]
     # For some reason on aarch64 linux_x86_64_glibc/libsf_mini_core.so is also built so ld is missing for x86
-    # - $RPATH/ld-linux-x86-64.so.2  # [linux and aarch64]
+    - $RPATH/ld-linux-x86-64.so.2  # [linux and aarch64]
 
 requirements:
   build:
@@ -78,6 +78,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_telemetry.py" %}
 # NameError: name 'ArrowConverterContext' is not defined
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
+# E   ModuleNotFoundError: No module named 'src'
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_telemetry_async.py" %}
 
 {% set tests_to_deselect = "" %}
 # AssertionError: $SRC_DIR/.wiremock does not exist
@@ -91,11 +93,6 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
 # CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
-
-# !!! TODO: check next version bump
-# raise ImportError("aio is not supported in this version of the connector")
-# https://github.com/snowflakedb/snowflake-connector-python/compare/v4.1.1...v4.2.0#diff-cee0e379944a8144da97a08f1c0b649942128eb1a9ea653a003d3a887899e61cR3-R4
-# {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio" %}
 
 test:
   imports:
