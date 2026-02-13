@@ -72,6 +72,8 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_oauth_token.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_proxies.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_oauth_token_async.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_proxies_async.py" %}
 # Using relative import
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_detect_platforms.py" %}
@@ -80,8 +82,10 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
 # E   ModuleNotFoundError: No module named 'src'
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_telemetry_async.py" %}
-# E   RuntimeError: There is no current event loop in thread 'MainThread'.
-# {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_connection_async_unit.py" %}  # [py==314]
+# MissingDependencyError: Missing optional dependency: aioboto3 (not available on channel)
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_auth_workload_identity_async.py" %}
+# AttributeError: 'async_generator' object has no attribute 'use_session'
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_ocsp.py" %}
 
 {% set tests_to_deselect = "" %}
 # AssertionError: $SRC_DIR/.wiremock does not exist
@@ -89,6 +93,8 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_connection.py::test_large_query_through_proxy" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_valid_pat_async" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_invalid_pat_async" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
@@ -98,6 +104,10 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
 # CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
+# snowflake.connector.errors.ProgrammingError: 251008: 251008: Failed to load private key: argument 'password': Cannot convert "<class 'int'>" instance to a buffer.
+# Please provide a valid rsa private key in DER format as bytes object. If the key is encrypted, provide the passphrase via private_key_passphrase
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_keypair_async.py::test_auth_keypair" %}
+
 
 test:
   imports:
@@ -154,8 +164,8 @@ test:
     - snowflake.connector.wif_util
   requires:
     - pip
-    - pytest <9
-    - numpy
+    - pytest <7.5.0
+    - numpy <=2.2.4
     - responses
     - aiohttp
     - pytest-tornasync
