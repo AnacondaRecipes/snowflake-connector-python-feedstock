@@ -86,6 +86,8 @@ requirements:
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_auth_workload_identity_async.py" %}
 # AttributeError: 'async_generator' object has no attribute 'use_session'
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_ocsp.py" %}
+# E   RuntimeError: There is no current event loop in thread 'MainThread'.
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_connection_async_unit.py" %}
 
 {% set tests_to_deselect = "" %}
 # AssertionError: $SRC_DIR/.wiremock does not exist
