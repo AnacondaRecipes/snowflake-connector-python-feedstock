@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.2.0" %}
+{% set version = "4.3.0" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 4fe89a615a9d303c67a094ada269a2ecbec43065064be0368ae90656e5813143
+  sha256: 9d3a7fa78c2968d4899f948f6154ccdd38666027afd12965176e0e6666c4513c
 
 build:
   number: 100
@@ -72,12 +72,22 @@ requirements:
 # AssertionError: $SRC_DIR/.wiremock does not exist
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_oauth_token.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_proxies.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_oauth_token_async.py" %}
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_proxies_async.py" %}
 # Using relative import
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_detect_platforms.py" %}
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_telemetry.py" %}
 # NameError: name 'ArrowConverterContext' is not defined
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
+# E   ModuleNotFoundError: No module named 'src'
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_telemetry_async.py" %}
+# MissingDependencyError: Missing optional dependency: aioboto3 (not available on channel)
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_auth_workload_identity_async.py" %}
+# AttributeError: 'async_generator' object has no attribute 'use_session'
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_ocsp.py" %}
+# E   RuntimeError: There is no current event loop in thread 'MainThread'.
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_connection_async_unit.py" %}
 
 {% set tests_to_deselect = "" %}
 # AssertionError: $SRC_DIR/.wiremock does not exist
@@ -85,17 +95,22 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_connection.py::test_large_query_through_proxy" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_valid_pat_async" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_invalid_pat_async" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_oauth_token_async.py::test_oauth_code_token_request_error_async" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
+
 # E       AssertionError: assert 'due to no permission on its parent directory' in ''
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
 # CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
+# snowflake.connector.errors.ProgrammingError: 251008: 251008: Failed to load private key: argument 'password': Cannot convert "<class 'int'>" instance to a buffer.
+# Please provide a valid rsa private key in DER format as bytes object. If the key is encrypted, provide the passphrase via private_key_passphrase
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_keypair_async.py::test_auth_keypair" %}
 
-# !!! TODO: check next version bump
-# raise ImportError("aio is not supported in this version of the connector")
-# https://github.com/snowflakedb/snowflake-connector-python/compare/v4.1.1...v4.2.0#diff-cee0e379944a8144da97a08f1c0b649942128eb1a9ea653a003d3a887899e61cR3-R4
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio" %}
 
 test:
   imports:
@@ -155,6 +170,8 @@ test:
     - pytest
     - numpy
     - responses
+    - aiohttp
+    - pytest-tornasync
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
