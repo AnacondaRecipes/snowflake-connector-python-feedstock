@@ -1,203 +1,124 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.4.0" %}
+{% set version = "5.0.0b1" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  # use GH release sources to use tests
-  url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f64c0726ff07595a59e160c01444a5e1f11635bdd64d5392a8c0ec307a7dcb55
+  - url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_')}}-{{ version }}.tar.gz
+    sha256: 17ea11f28f53dc6a41eb35cf4348ee58d9ea7f2c4cc32011cc82fbfef66519ba
+  - url: https://github.com/snowflakedb/universal-driver/archive/refs/tags/snowflake-connector-python/5.0.0b1.tar.gz
+    sha256: 1590883e41062531a26214769e7cc73b242c7f1ac1d138134ddbded674cfea4c
+    folder: gh_src
 
 build:
   number: 100
-  skip: true  # [py<39]
   script:
-    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
-  entry_points:
-    - snowflake-dump-ocsp-response = snowflake.connector.tool.dump_ocsp_response:main
-    - snowflake-dump-ocsp-response-cache = snowflake.connector.tool.dump_ocsp_response_cache:main
-    - snowflake-dump-certs = snowflake.connector.tool.dump_certs:main
-  # libc.musl-xxx.so.1 is not available on our CI linux distribution (will be on ALPINE linux instead of glibc)
-  # https://github.com/snowflakedb/snowflake-connector-python/blob/aaa214835278e5b47db7b985642ca5ed880ebfda/src/snowflake/connector/_utils.py#L175-L197
-  missing_dso_whitelist: # [linux]
-    - $RPATH/libc.musl-aarch64.so.1  # [linux]
-    - $RPATH/libc.musl-x86_64.so.1  # [linux]
-    # For some reason on aarch64 linux_x86_64_glibc/libsf_mini_core.so is also built so ld is missing for x86
-    - $RPATH/ld-linux-x86-64.so.2  # [linux and aarch64]
+    # The Rust kernel sf_core pulls native OpenSSL (openssl crate in sf_core/Cargo.toml).
+    # Without the vendored-openssl feature, by default it goes through openssl-sys and finds OpenSSL in the system:
+    - export OPENSSL_DIR=$PREFIX  # [unix]
+    - export OPENSSL_LIB_DIR=$PREFIX/lib  # [unix]
+    - export OPENSSL_INCLUDE_DIR=$PREFIX/include  # [unix]
+    - set OPENSSL_DIR=%LIBRARY_PREFIX%  # [win]
+    - set OPENSSL_LIB_DIR=%LIBRARY_PREFIX%\lib  # [win]
+    - set OPENSSL_INCLUDE_DIR=%LIBRARY_PREFIX%\include  # [win]
+    # Use CMake to build aws-lc-sys; more reliable than the default cc-crate
+    # builder in conda's Windows toolchain environment.
+    - set AWS_LC_SYS_CMAKE_BUILDER=1  # [win]
+    - set AWS_LC_SYS_PREBUILT_NASM=1  # [win]
+    # vcruntime_c11_stdatomic.h raises - error: "C atomics require C11 or later"
+    # skip the jitter entropy code that requires _Atomic
+    - set AWS_LC_SYS_NO_JITTER_ENTROPY=1  # [win]
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+  missing_dso_whitelist:
+    - $RPATH/api-ms-win-core-winrt-string-l1-1-0.dll  # [win]
+    - $RPATH/api-ms-win-core-winrt-error-l1-1-0.dll  # [win]
+    - $RPATH/api-ms-win-core-winrt-l1-1-0.dll  # [win]
+    - zlib.dll  # [win]
+  skip: true  # [py<39]
 
 requirements:
   build:
     - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ compiler('rust') }}
+    - cmake  # [win]
+    - ninja-base  # [win]
+    # thread 'main' (2689) panicked at proto_generator/src/protoc_installer.rs:117:10:
+    # Failed to execute unzip.
+    - unzip  # [linux]
+    # Required by aws-lc-sys
+    - nasm  # [win]
   host:
     - python
     - pip
+    - hatchling
+    - editables
     - cython
-    - setuptools >=40.6.0
     - wheel
+    - setuptools
+    - mypy-protobuf >=5.0,<6
+    # Could not find directory of OpenSSL installation
+    - openssl {{ openssl }}
   run:
     - python
-    - asn1crypto >0.24.0,<2.0.0
-    - cryptography >=46.0.5
-    - pyopenssl >=24.0.0
-    - pyjwt >=2.10.1,<3.0.0
+    - cryptography >=44.0.1
+    - protobuf >=6.32.1
     - pytz
-    - requests >=2.32.4,<3.0.0
-    - packaging
-    - charset-normalizer >=2,<4
-    - idna >=3.7,<4
-    - urllib3 >=1.26.5,<2.0.0  # [py<310]
-    - certifi >=2024.7.4
-    - typing_extensions >=4.3,<5
-    - filelock >=3.5,<4
-    - sortedcontainers >=2.4.0
-    - platformdirs >=2.6.0,<5.0.0
-    - tomlkit
-    # Confirmed with Snowflake: Boto3/Botocore are optional only if SNOWFLAKE_NO_BOTO is set; otherwise mandatory.
-    - boto3 >=1.24
-    - botocore >=1.24
+    - tomlkit >=0.13
   run_constrained:
-    - pandas >=1.0.0,<3.0.0  # [py<313]
-    - pandas >=2.1.2,<3.0.0  # [py>=313]
+    # pandas
     - pyarrow >=14.0.1
-    - keyring >=23.1.0,<26.0.0
+    - pandas >=1.0.0,<3.0.0  # [py<313]
+    - pandas >=2.1.2  # [py>=313]
 
-{% set tests_to_ignore = "" %}
-# AssertionError: $SRC_DIR/.wiremock/wiremock-standalone.jar does not exist.
-# This file is excluded from the release tarball. Just ignore this test.
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_wiremock_client.py" %}
-# AssertionError: $SRC_DIR/.wiremock does not exist
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_oauth_token.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_proxies.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_oauth_token_async.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_proxies_async.py" %}
-# Using relative import
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_network.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_detect_platforms.py" %}
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_telemetry.py" %}
-# NameError: name 'ArrowConverterContext' is not defined
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_converter.py" %}
-# E   ModuleNotFoundError: No module named 'src'
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_telemetry_async.py" %}
-# MissingDependencyError: Missing optional dependency: aioboto3 (not available on channel)
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_auth_workload_identity_async.py" %}
-# AttributeError: 'async_generator' object has no attribute 'use_session'
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_ocsp.py" %}
-# E   RuntimeError: There is no current event loop in thread 'MainThread'.
-{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/aio/test_connection_async_unit.py" %}
-
-{% set tests_to_deselect = "" %}
-# AssertionError: $SRC_DIR/.wiremock does not exist
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_valid_pat" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_programmatic_access_token.py::test_invalid_pat" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_connection.py::test_large_query_through_proxy" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_valid_pat_async" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_invalid_pat_async" %}
-# snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_oauth_token_async.py::test_oauth_code_token_request_error_async" %}
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
-
-# E       AssertionError: assert 'due to no permission on its parent directory' in ''
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_configmanager.py::test_log_debug_config_file_parent_dir_permissions" %}
-# CI issue: <class 'OSError'>: [Errno 66] Directory not empty: '/private/var/folders/bf/zv4tnz9n509d_vvdxt3l9w8c0000gn/T/pytest-of-ec2-user/garbage-d8c54368-5431-4391-8587-36c6b5f8208f'
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_crl_cache.py::test_cleanup_loop_handles_exceptions_gracefully" %}  # [osx]
-# snowflake.connector.errors.ProgrammingError: 251008: 251008: Failed to load private key: argument 'password': Cannot convert "<class 'int'>" instance to a buffer.
-# Please provide a valid rsa private key in DER format as bytes object. If the key is encrypted, provide the passphrase via private_key_passphrase
-{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_keypair_async.py::test_auth_keypair" %}
-
-
+# raise RuntimeError("SNOWFLAKE_TEST_PRIVATE_KEY_CONTENTS not found in test parameters.")
+{% set deselect_tests = " --deselect=gh_src/python/tests/unit/test_module.py::TestModuleConnectFunction::test_connect_returns_connection" %}
 test:
+  source_files:
+    - gh_src/python/tests
   imports:
-    - snowflake
     - snowflake.connector
-    - snowflake.connector.arrow_context
+    - snowflake.connector._core
+    - snowflake.connector._internal
     - snowflake.connector.auth
-    - snowflake.connector.auth._http_server
-    - snowflake.connector.auth.by_plugin
-    - snowflake.connector.auth.keypair
-    - snowflake.connector.compat
+    - snowflake.connector.cursor
     - snowflake.connector.config_manager
     - snowflake.connector.connection
-    - snowflake.connector.constants
-    - snowflake.connector.converter
-    - snowflake.connector.converter_null
-    - snowflake.connector.converter_snowsql
-    - snowflake.connector.cursor
-    - snowflake.connector.dbapi
-    - snowflake.connector.description
-    - snowflake.connector.encryption_util
-    - snowflake.connector.errorcode
     - snowflake.connector.errors
-    - snowflake.connector.externals_utils.externals_setup
-    - snowflake.connector.file_transfer_agent
-    - snowflake.connector.file_util
-    - snowflake.connector.logging_utils.filters
-    - snowflake.connector.nanoarrow_arrow_iterator
-    - snowflake.connector.network
-    - snowflake.connector.ocsp_asn1crypto
-    - snowflake.connector.ocsp_snowflake
-    - snowflake.connector.options
-    - snowflake.connector.platform_detection
     - snowflake.connector.result_batch
-    - snowflake.connector.result_set
-    - snowflake.connector.secret_detector
-    - snowflake.connector.session_manager
-    - snowflake.connector.sfbinaryformat
-    - snowflake.connector.sfdatetime
-    - snowflake.connector.sqlstate
-    - snowflake.connector.ssl_wrap_socket
-    - snowflake.connector.telemetry
-    - snowflake.connector.telemetry_oob
-    - snowflake.connector.token_cache
     - snowflake.connector.util_text
-    - snowflake.connector.vendored
-    - snowflake.connector.vendored.requests
-    - snowflake.connector.vendored.requests.exceptions
-    - snowflake.connector.vendored.requests.models
-    - snowflake.connector.vendored.urllib3
-    - snowflake.connector.vendored.urllib3.connection
-    - snowflake.connector.vendored.urllib3.contrib.pyopenssl
     - snowflake.connector.version
-    - snowflake.connector.wif_util
+  commands:
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v gh_src/python/tests/unit {{ deselect_tests }}
   requires:
     - pip
     - pytest
     - numpy
-    - responses
-    - aiohttp
-    - pytest-tornasync
-  source_files:
-    - test
-    # ModuleNotFoundError: No module named 'check_no_native_http'
-    - ci/pre-commit/check_no_native_http.py
-  commands:
-    - pip check
-    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
+    - mock
+    - cryptography
+    - pyarrow >=14.0.1
+    - pandas >=1.0.0,<3.0.0  # [py<313]
+    - pandas >=2.1.2  # [py>=313]
+    - requests
 
 about:
-  home: https://github.com/snowflakedb/snowflake-connector-python
-  # MIT: src/snowflake/connector/vendored/urllib3/LICENSE.txt
-  license: Apache-2.0 AND MIT
-  license_family: Other
-  license_file:
-    - LICENSE.txt
-    - NOTICE
-  summary: Snowflake Connector for Python
+  home: https://github.com/snowflakedb/universal-driver
+  summary: A PEP 249 Database API 2.0 implementation for Snowflake
+  license: Apache-2.0
+  license_family: Apache
+  license_file: gh_src/LICENSE
   description: |
-    The Snowflake Connector for Python provides an interface for
-    developing Python applications that can connect to Snowflake
-    and perform all standard operations. It provides a programming
-    alternative to developing applications in Java or C/C++ using
-    the Snowflake JDBC or ODBC drivers.
-  doc_url: https://docs.snowflake.net/manuals/user-guide/python-connector.html
-  dev_url: https://github.com/snowflakedb/snowflake-connector-python
+    A Python library that implements PEP 249 (Python Database API Specification 2.0)
+    with empty interface implementations. This library provides a complete skeleton
+    implementation that follows the PEP 249 specification, making it an ideal starting
+    point for creating new database drivers or for testing database API compliance.
+  doc_url: https://github.com/snowflakedb/universal-driver/blob/main/README.md
+  dev_url: https://github.com/snowflakedb/universal-driver
 
 extra:
   recipe-maintainers:
@@ -206,3 +127,5 @@ extra:
     - xhochy
     - mariusvniekerk
     - fhoehle
+  skip-lints:
+    - host_section_needs_exact_pinnings
