@@ -113,6 +113,10 @@ requirements:
 
 
 test:
+  source_files:
+    - test
+    # ModuleNotFoundError: No module named 'check_no_native_http'
+    - ci/pre-commit/check_no_native_http.py
   imports:
     - snowflake
     - snowflake.connector
@@ -165,6 +169,10 @@ test:
     - snowflake.connector.vendored.urllib3.contrib.pyopenssl
     - snowflake.connector.version
     - snowflake.connector.wif_util
+  commands:
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
   requires:
     - pip
     - pytest
@@ -172,14 +180,8 @@ test:
     - responses
     - aiohttp
     - pytest-tornasync
-  source_files:
-    - test
-    # ModuleNotFoundError: No module named 'check_no_native_http'
-    - ci/pre-commit/check_no_native_http.py
-  commands:
-    - pip check
-    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
+    - pandas >=1.0.0,<3.0.0  # [py<313]
+    - pandas >=2.1.2,<3.0.0  # [py>=313]
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
