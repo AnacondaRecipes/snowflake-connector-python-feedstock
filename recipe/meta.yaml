@@ -1,14 +1,14 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.4.0" %}
+{% set version = "4.5.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f64c0726ff07595a59e160c01444a5e1f11635bdd64d5392a8c0ec307a7dcb55
+  sha256: cc5f6d33ec5f1abedb6dea69a8fb0d127e16fdd86d06e12d9dcfbd554a439239
 
 build:
   number: 100
@@ -111,8 +111,16 @@ requirements:
 # Please provide a valid rsa private key in DER format as bytes object. If the key is encrypted, provide the passphrase via private_key_passphrase
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_keypair_async.py::test_auth_keypair" %}
 
+# .wiremock/wiremock-standalone.jar does not exist in upstream release tarball, need to ignore this test
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_redirect_retry.py" %}
 
 test:
+  files:
+    - .wiremock
+  source_files:
+    - test
+    # ModuleNotFoundError: No module named 'check_no_native_http'
+    - ci/pre-commit/check_no_native_http.py
   imports:
     - snowflake
     - snowflake.connector
@@ -165,6 +173,10 @@ test:
     - snowflake.connector.vendored.urllib3.contrib.pyopenssl
     - snowflake.connector.version
     - snowflake.connector.wif_util
+  commands:
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
   requires:
     - pip
     - pytest
@@ -172,14 +184,9 @@ test:
     - responses
     - aiohttp
     - pytest-tornasync
-  source_files:
-    - test
-    # ModuleNotFoundError: No module named 'check_no_native_http'
-    - ci/pre-commit/check_no_native_http.py
-  commands:
-    - pip check
-    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v test/unit {{ tests_to_ignore }} {{ tests_to_deselect }}
+    - pandas >=1.0.0,<3.0.0  # [py<313]
+    - pandas >=2.1.2,<3.0.0  # [py>=313]
+    - pyarrow >=14.0.1
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
