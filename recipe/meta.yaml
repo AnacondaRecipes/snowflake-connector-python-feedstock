@@ -113,6 +113,8 @@ requirements:
 
 
 test:
+  files:
+    - .wiremock
   source_files:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
