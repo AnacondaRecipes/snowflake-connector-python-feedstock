@@ -1,14 +1,14 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.4.0" %}
+{% set version = "4.5.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f64c0726ff07595a59e160c01444a5e1f11635bdd64d5392a8c0ec307a7dcb55
+  sha256: cc5f6d33ec5f1abedb6dea69a8fb0d127e16fdd86d06e12d9dcfbd554a439239
 
 build:
   number: 100
