@@ -182,6 +182,7 @@ test:
     - pytest-tornasync
     - pandas >=1.0.0,<3.0.0  # [py<313]
     - pandas >=2.1.2,<3.0.0  # [py>=313]
+    - pyarrow >=14.0.1
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
