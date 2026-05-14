@@ -111,6 +111,8 @@ requirements:
 # Please provide a valid rsa private key in DER format as bytes object. If the key is encrypted, provide the passphrase via private_key_passphrase
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_keypair_async.py::test_auth_keypair" %}
 
+# .wiremock/wiremock-standalone.jar does not exist in upstream release tarball, need to ignore this test
+{% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_redirect_retry.py" %}
 
 test:
   files:
