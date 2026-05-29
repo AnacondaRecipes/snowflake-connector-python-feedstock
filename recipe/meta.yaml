@@ -120,6 +120,7 @@ test:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
     - ci/pre-commit/check_no_native_http.py
+    - setup.py
   imports:
     - snowflake
     - snowflake.connector
