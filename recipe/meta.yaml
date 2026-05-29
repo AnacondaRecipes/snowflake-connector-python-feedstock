@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.5.0" %}
+{% set version = "4.6.0" %}
 
 package:
   name: {{ name }}
@@ -8,11 +8,11 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: cc5f6d33ec5f1abedb6dea69a8fb0d127e16fdd86d06e12d9dcfbd554a439239
+  sha256: 578447256f4de2a1adb0a6455af67a2829816576cdb4996f80da04e74794044b
 
 build:
   number: 100
-  skip: true  # [py<39]
+  skip: true  # [py<310]
   script:
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
@@ -49,7 +49,6 @@ requirements:
     - packaging
     - charset-normalizer >=2,<4
     - idna >=3.7,<4
-    - urllib3 >=1.26.5,<2.0.0  # [py<310]
     - certifi >=2024.7.4
     - typing_extensions >=4.3,<5
     - filelock >=3.5,<4
