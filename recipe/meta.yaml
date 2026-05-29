@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.5.0" %}
+{% set version = "4.6.0" %}
 
 package:
   name: {{ name }}
@@ -8,11 +8,11 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: cc5f6d33ec5f1abedb6dea69a8fb0d127e16fdd86d06e12d9dcfbd554a439239
+  sha256: 578447256f4de2a1adb0a6455af67a2829816576cdb4996f80da04e74794044b
 
 build:
   number: 100
-  skip: true  # [py<39]
+  skip: true  # [py<310]
   script:
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   entry_points:
@@ -49,7 +49,6 @@ requirements:
     - packaging
     - charset-normalizer >=2,<4
     - idna >=3.7,<4
-    - urllib3 >=1.26.5,<2.0.0  # [py<310]
     - certifi >=2024.7.4
     - typing_extensions >=4.3,<5
     - filelock >=3.5,<4
@@ -114,6 +113,13 @@ requirements:
 # .wiremock/wiremock-standalone.jar does not exist in upstream release tarball, need to ignore this test
 {% set tests_to_ignore = tests_to_ignore + " --ignore=test/unit/test_redirect_retry.py" %}
 
+# E   FileNotFoundError: [Errno 2] No such file or directory: 'src/snowflake/connector/generated_version.py'
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_matches_platform" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_prune_minicore" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_returns_none_for_unknown_platform" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_pruner_agrees_with_runtime_loader" %}
+
+
 test:
   files:
     - .wiremock
@@ -121,6 +127,7 @@ test:
     - test
     # ModuleNotFoundError: No module named 'check_no_native_http'
     - ci/pre-commit/check_no_native_http.py
+    - setup.py
   imports:
     - snowflake
     - snowflake.connector
