@@ -116,6 +116,9 @@ requirements:
 # E   FileNotFoundError: [Errno 2] No such file or directory: 'src/snowflake/connector/generated_version.py'
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_matches_platform" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_prune_minicore" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_returns_none_for_unknown_platform" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_pruner_agrees_with_runtime_loader" %}
+
 
 test:
   files:
