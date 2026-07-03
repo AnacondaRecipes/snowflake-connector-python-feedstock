@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.6.0" %}
+{% set version = "4.7.0" %}
 
 package:
   name: {{ name }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 578447256f4de2a1adb0a6455af67a2829816576cdb4996f80da04e74794044b
+  sha256: 787fcfb36321928d6f58f6a20164decf9c74144a4bfd7806652daad5292b7634
 
 build:
   number: 100
@@ -59,9 +59,13 @@ requirements:
     - boto3 >=1.24
     - botocore >=1.24
   run_constrained:
+    # azure
+    - azure-identity >=1.16
+    # pandas
     - pandas >=1.0.0,<3.0.0  # [py<313]
     - pandas >=2.1.2,<3.0.0  # [py>=313]
     - pyarrow >=14.0.1
+    # secure-local-storage
     - keyring >=23.1.0,<26.0.0
 
 {% set tests_to_ignore = "" %}
