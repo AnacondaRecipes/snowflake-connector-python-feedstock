@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: fad8e1fb0c49eb1d93dad785ce738dac17473c6826f8cd36ee8d6f9675bceae1
+  sha256: f401a410af19ad730ce4151682304499c776ab8fe5c396bc9a19938ecff982c3
 
 build:
   number: 100
