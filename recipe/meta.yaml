@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.6.0" %}
+{% set version = "4.7.1" %}
 
 package:
   name: {{ name }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 578447256f4de2a1adb0a6455af67a2829816576cdb4996f80da04e74794044b
+  sha256: f401a410af19ad730ce4151682304499c776ab8fe5c396bc9a19938ecff982c3
 
 build:
   number: 100
@@ -59,9 +59,14 @@ requirements:
     - boto3 >=1.24
     - botocore >=1.24
   run_constrained:
+    # azure
+    - azure-identity >=1.16
+    # pandas
     - pandas >=1.0.0,<3.0.0  # [py<313]
     - pandas >=2.1.2,<3.0.0  # [py>=313]
-    - pyarrow >=14.0.1
+    - pyarrow >=14.0.1,<24  # [py>=314]
+    - pyarrow >=14.0.1  # [py<314]
+    # secure-local-storage
     - keyring >=23.1.0,<26.0.0
 
 {% set tests_to_ignore = "" %}
@@ -119,6 +124,10 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_returns_none_for_unknown_platform" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_pruner_agrees_with_runtime_loader" %}
 
+# Unstable test with timeout
+# >   assert os.path.getmtime(tmp_cache_file) > second_updated_time
+# E   AssertionError: assert 1785750850.6178732 > 1785750850.6178732
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::test_file_is_not_updated" %}
 
 test:
   files:
@@ -193,7 +202,9 @@ test:
     - pytest-tornasync
     - pandas >=1.0.0,<3.0.0  # [py<313]
     - pandas >=2.1.2,<3.0.0  # [py>=313]
-    - pyarrow >=14.0.1
+    - pyarrow >=14.0.1,<24  # [py>=314]
+    - pyarrow >=14.0.1  # [py<314]
+    - azure-identity >=1.16
 
 about:
   home: https://github.com/snowflakedb/snowflake-connector-python
