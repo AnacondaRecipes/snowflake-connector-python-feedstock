@@ -124,6 +124,10 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_native_subdir_returns_none_for_unknown_platform" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_setup_minicore_pruner.py::test_pruner_agrees_with_runtime_loader" %}
 
+# Unstable test with timeout
+# >   assert os.path.getmtime(tmp_cache_file) > second_updated_time
+# E   AssertionError: assert 1785750850.6178732 > 1785750850.6178732
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_cache.py::test_file_is_not_updated" %}
 
 test:
   files:
