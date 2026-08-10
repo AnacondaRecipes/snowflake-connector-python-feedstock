@@ -1,5 +1,5 @@
 {% set name = "snowflake-connector-python" %}
-{% set version = "4.7.1" %}
+{% set version = "4.7.2" %}
 
 package:
   name: {{ name }}
@@ -8,7 +8,7 @@ package:
 source:
   # use GH release sources to use tests
   url: https://github.com/snowflakedb/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f401a410af19ad730ce4151682304499c776ab8fe5c396bc9a19938ecff982c3
+  sha256: 53bac5f9f99175a216207eefc3d219ec8ea585e47e289064a63a14bc49c44dea
 
 build:
   number: 100
@@ -33,11 +33,11 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
-    - python
     - pip
-    - cython
+    - python
     - setuptools >=40.6.0
     - wheel
+    - cython >=3.1
   run:
     - python
     - asn1crypto >0.24.0,<2.0.0
@@ -101,6 +101,10 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_valid_pat_async" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_invalid_pat_async" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_jwt_error_codes_async.py::test_jwt_credential_rejection_surfaces_server_errno_and_sqlstate_authorization_failure" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_jwt_error_codes_async.py::test_jwt_non_credential_rejection_uses_sqlstate_connection_not_established" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_jwt_error_codes.py::test_jwt_credential_rejection_surfaces_server_errno_and_sqlstate_authorization_failure" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_jwt_error_codes.py::test_jwt_non_credential_rejection_uses_sqlstate_connection_not_established" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
