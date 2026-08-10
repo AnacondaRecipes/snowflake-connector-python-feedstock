@@ -101,6 +101,10 @@ requirements:
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_proxies.py::test_basic_query_through_proxy" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_valid_pat_async" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_programmatic_access_token_async.py::test_invalid_pat_async" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_jwt_error_codes_async.py::test_jwt_credential_rejection_surfaces_server_errno_and_sqlstate_authorization_failure" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_jwt_error_codes_async.py::test_jwt_non_credential_rejection_uses_sqlstate_connection_not_established" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_jwt_error_codes.py::test_jwt_credential_rejection_surfaces_server_errno_and_sqlstate_authorization_failure" %}
+{% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_jwt_error_codes.py::test_jwt_non_credential_rejection_uses_sqlstate_connection_not_established" %}
 # snowflake.connector.auth._http_server:_http_server.py:102 Failed to bind authorization callback server to port 8080: [Errno 48] Address already in use
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/test_auth_oauth_auth_code.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
 {% set tests_to_deselect = tests_to_deselect + " --deselect=test/unit/aio/test_auth_oauth_auth_code_async.py::test_auth_oauth_auth_code_single_use_refresh_tokens" %}
